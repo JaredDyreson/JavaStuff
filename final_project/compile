@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+#find src/ -maxdepth 1 -type f -name '*.java' | sort -n | while read file; do
+        #echo "[+] Processing $file"
+        #csrc "$file"
+#done
+#pdfunite csrc_exported/* "src_compiled".pdf
+echo "[+] Merging all screenshots..."
+convert ~/Pictures/Selection_4{52..69}.png -append src_compiled.pdf
+echo "[+] Processing GUI screenshots"
+convert screenshots/raw_source/* -append "gui_compiled".pdf
+echo "[+] Appending TOC to the screenshots"
+pandoc TOC.md --variable urlcolor=blue -o TOC.pdf
+pdfunite TOC.pdf "gui_compiled".pdf "toc_gui_compiled".pdf
+echo "[+] Stitching everything together"
+pdfunite "src_compiled".pdf "toc_gui_compiled".pdf "final_project".pdf
+echo "[+] Compiling the powerpoint..."
+cd presentation/
+pandoc final_project_presentation.md -s --wrap auto -o ../final_presentation.pptx
+cd ../
+echo "[+] Cleaning up the mess"
+rm -rf "gui_compiled".pdf "toc_gui_compiled".pdf "src_compiled".pdf csrc_exported TOC.pdf
